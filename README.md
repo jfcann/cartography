@@ -1,6 +1,6 @@
 # Command-line Cartography [UK edition]
 
-This repo aims to walk through [Mike Bostock's](https://bost.ocks.org/mike/) Command-line Cartography series - creating a population density choropleth on the command-line using javascript packages. The original series mapped sunny California. We'll map the soggy UK instead. Most of the wit and wisdom has been suppressed (and Mike's a bit of a dude) so be sure to check out the original:
+This repo aims to run through [Mike Bostock's](https://bost.ocks.org/mike/) Command-line Cartography series - creating a population density choropleth on the command-line using javascript packages. The original series mapped sunny California. We'll map the soggy UK instead. Most of the wit and wisdom has been suppressed (and Mike's a bit of a dude) so be sure to check out the original:
 + [Part 1](https://medium.com/@mbostock/command-line-cartography-part-1-897aa8f8ca2c)
 + [Part 2](https://medium.com/@mbostock/command-line-cartography-part-2-c3a82c5c0f3)
 + [Part 3](https://medium.com/@mbostock/command-line-cartography-part-3-1158e4c55a1e)
@@ -18,7 +18,6 @@ IMPORTANT: if (like me) you're working through on Powershell, for each ```comman
 ```cmd /c 'command'```
 
 ## Part 1: Get geography and project
-Sources:
 
 ```
 shp2json Lower_Layer_Super_Output_Areas_December_2011_Boundaries_EW_BSC.shp -o uk.json
@@ -28,7 +27,6 @@ geo2svg -w 960 -h 960 < uk-merc.json > uk-merc.svg
 ```
 
 ## Part 2: Get data and join
-Sources:
 
 ```
 ndjson-split "d.features" < uk-merc.json > uk-merc.ndjson
@@ -43,6 +41,7 @@ geo2svg -n --stroke=none -p 1 -w 960 -h 960 < uk-merc-colour.ndjson > uk-merc-co
 ```
 
 ## Part 3: Topology for the browser
+
 ```
 geo2topo -n tracts=uk-merc-density.ndjson > uk-tracts-topo.json
 toposimplify -p 1 -f < uk-tracts-topo.json > uk-simple-topo.json
@@ -51,7 +50,8 @@ topomerge lauth=tracts -k 'd.properties.la' < uk-quantized-topo.json > uk-authme
 topomerge --mesh -f 'a !== b' lauth=lauth < uk-authmerge-topo.json > uk-topo.json
 ```
 
-## Part 4: 
+## Part 4: Expressive scales
+
 ```
 topo2geo lauth=- < uk-topo.json | ndjson-map -r d3 "z = d3.scaleSequential(d3.interpolateViridis).domain([0, 8000]), d.features.forEach(f=>f.properties.fill = z(f.properties.density)), d" | ndjson-split "d.features" | geo2svg -n --stroke none -p 1 -w 960 -h 960 > uk-lauth-color.svg
 topo2geo tracts=- < uk-topo.json | ndjson-map -r d3 "z = d3.scaleSequential(d3.interpolateViridis).domain([0, 10]), d.features.forEach(f=>f.properties.fill = z(Math.sqrt(f.properties.density))), d" | ndjson-split "d.features" | geo2svg -n --stroke none -p 1 -w 960 -h 960 > uk-tracts-sqrt.svg
